@@ -1,0 +1,68 @@
+{
+  "name": "remix-script-runner",
+  "version": "1.0.0",
+  "description": "Remix plugin for executing script in a separate iframe",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "browserify src/script-runner.js -o build/script-runner.js --exclude solc"
+  },
+  "dependencies": {
+    "@babel/core": "^7.4.5",
+    "@babel/plugin-transform-object-assign": "^7.2.0",
+    "@babel/polyfill": "^7.4.4",
+    "@babel/preset-env": "^7.4.5",
+    "@babel/preset-es2015": "latest",
+    "@babel/preset-es2017": "latest",
+    "@babel/preset-stage-0": "^7.0.0",
+    "@babel/register": "^7.4.4",
+    "@remixproject/plugin": "^0.1.9",
+    "babelify": "^10.0.0",
+    "browserify": "^16.2.3",
+    "ethers": "^4.0.44",
+    "fast-async": "^7.0.6",
+    "swarmgw": "^0.3.1",
+    "web3": "^1.2.6"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/yann300/remix-script-runner.git"
+  },
+  "author": "",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/yann300/remix-script-runner/issues"
+  },
+  "homepage": "https://github.com/yann300/remix-script-runner#readme",
+  "browserify": {
+    "transform": [
+      [
+        "babelify",
+        {
+          "sourceMapsAbsolute": false,
+          "sourceMaps": true,
+          "plugins": [
+            [
+              "module:fast-async",
+              {
+                "runtimePattern": null,
+                "compiler": {
+                  "es7": true,
+                  "noRuntime": true,
+                  "promises": true,
+                  "wrapAwait": true
+                }
+              }
+            ],
+            [
+              "module:@babel/plugin-transform-object-assign"
+            ]
+          ],
+          "presets": [
+            "@babel/preset-env"
+          ]
+        }
+      ]
+    ]
+  }
+}
