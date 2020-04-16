@@ -1,6 +1,6 @@
 'use strict'
 import { connectIframe, PluginClient } from '@remixproject/plugin'
-import ethers from 'ethers' // eslint-disable-line
+import { ethers } from 'ethers' // eslint-disable-line
 import Web3 from 'web3'
 import swarmgw_fn from 'swarmgw'
 window.swarmgw = swarmgw_fn()
@@ -25,7 +25,7 @@ connectIframe(window.remix)
 
 window.web3Provider = {
   sendAsync(payload, callback) {
-    window.remix.call('appWeb3Provider', 'sendAsync', payload)
+    window.remix.call('web3Provider', 'sendAsync', payload)
       .then(result => callback(null, result))
       .catch(e => callback(e))
   }
