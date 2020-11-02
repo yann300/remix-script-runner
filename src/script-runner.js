@@ -1,5 +1,6 @@
 'use strict'
-import { connectIframe, PluginClient } from '@remixproject/plugin'
+import { createClient } from '@remixproject/plugin-iframe';
+import { PluginClient } from '@remixproject/plugin';
 import { ethers } from 'ethers' // eslint-disable-line
 import Web3 from 'web3'
 import swarmgw_fn from 'swarmgw'
@@ -21,7 +22,7 @@ class CodeExecutor extends PluginClient {
   }
 }
 window.remix = new CodeExecutor()
-connectIframe(window.remix)
+createClient(window.remix)
 
 window.web3Provider = {
   sendAsync(payload, callback) {
