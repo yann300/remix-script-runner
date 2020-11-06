@@ -32,6 +32,7 @@ window.web3Provider = {
   }
 }
 window.web3 = new Web3(window.web3Provider)
+if (window.ethereum) window.ethereum.autoRefreshOnNetworkChange = false
 
 console.log = function () {
   window.remix.emit('log', {
