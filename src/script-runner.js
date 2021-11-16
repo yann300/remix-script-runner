@@ -4,6 +4,7 @@ import { PluginClient } from '@remixproject/plugin';
 import { ethers } from 'ethers' // eslint-disable-line
 import Web3 from 'web3'
 import swarmgw_fn from 'swarmgw'
+import * as starknet from 'starknet';
 window.swarmgw = swarmgw_fn()
 window.ethers = ethers
 window.Web3 = Web3
@@ -32,6 +33,8 @@ window.web3Provider = {
   }
 }
 window.web3 = new Web3(window.web3Provider)
+
+window.starknet = starknet
 
 console.log = function () {
   window.remix.emit('log', {
