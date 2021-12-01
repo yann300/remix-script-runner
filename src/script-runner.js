@@ -5,12 +5,14 @@ import { ethers } from 'ethers' // eslint-disable-line
 import Web3 from 'web3'
 import swarmgw_fn from 'swarmgw'
 import * as starknet from 'starknet';
+import * as babel from "@babel/standalone";
 window.swarmgw = swarmgw_fn()
 window.ethers = ethers
 window.Web3 = Web3
 
 class CodeExecutor extends PluginClient {
   execute (script) {
+    script = babel.transform(script, { presets: ["env"] }).code
     if (script) {
       try {
         (new Function(script))()
@@ -35,6 +37,13 @@ window.web3Provider = {
 window.web3 = new Web3(window.web3Provider)
 
 window.starknet = starknet
+
+window.require = async function (path) {
+  // For now, path should be related to workspace root directory
+  const doesExist = await window.remix.call('fileManager', 'exists', path)
+  if(doesExist) window.remix.execute(await window.remix.call('fileManager', 'readFile', path))
+  else console.error(`File ${path} does not exist`)
+}
 
 console.log = function () {
   window.remix.emit('log', {

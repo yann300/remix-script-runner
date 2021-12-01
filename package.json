@@ -16,6 +16,7 @@
     "@babel/preset-es2017": "latest",
     "@babel/preset-stage-0": "^7.0.0",
     "@babel/register": "^7.4.4",
+    "@babel/standalone": "^7.16.4",
     "@remixproject/plugin": "^0.3.1",
     "@remixproject/plugin-iframe": "^0.3.1",
     "babelify": "^10.0.0",
