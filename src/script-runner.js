@@ -93,11 +93,14 @@ class MochaReporter {
       .once(mochaConstant.EVENT_RUN_BEGIN, () => {
         console.log('start');
       })
-      .on(mochaConstant.EVENT_SUITE_BEGIN, () => {
+      .on(mochaConstant.EVENT_SUITE_BEGIN, (suite) => {
+        console.logInternal('EVENT_SUITE_BEGIN->', suite)
         this.increaseIndent();
       })
-      .on(mochaConstant.EVENT_SUITE_END, () => {
+      .on(mochaConstant.EVENT_SUITE_END, (suite) => {
+        console.logInternal('EVENT_SUITE_END->', suite)
         this.decreaseIndent();
+        suite.dispose()
       })
       .on(mochaConstant.EVENT_TEST_PASS, test => {
         // Test#fullTitle() returns the suite name(s)
