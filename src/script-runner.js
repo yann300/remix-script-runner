@@ -86,47 +86,47 @@ const mochaConstant = {
 // this reporter outputs test results, indenting two spaces per suite
 class MochaReporter {
   constructor(runner) {
-    this._indents = 0;
-    const stats = runner.stats;
+    this._indents = 0
+    const stats = runner.stats
 
     runner
       .once(mochaConstant.EVENT_RUN_BEGIN, () => {
-        console.log('start');
+        console.log('Running tests ....')
       })
       .on(mochaConstant.EVENT_SUITE_BEGIN, (suite) => {
-        console.logInternal('EVENT_SUITE_BEGIN->', suite)
-        this.increaseIndent();
+        this.increaseIndent()
+        console.log(`${this.indent()}${suite.title}`)
       })
       .on(mochaConstant.EVENT_SUITE_END, (suite) => {
-        console.logInternal('EVENT_SUITE_END->', suite)
-        this.decreaseIndent();
+        this.decreaseIndent()
         suite.dispose()
+        if(suite.root) suite.suites = []
       })
       .on(mochaConstant.EVENT_TEST_PASS, test => {
         // Test#fullTitle() returns the suite name(s)
         // prepended to the test title
-        console.log(`${this.indent()}pass: ${test.fullTitle()}`);
+        console.log(`${this.indent()}pass: ${test.fullTitle()}`)
       })
       .on(mochaConstant.EVENT_TEST_FAIL, (test, err) => {
         console.log(
           `${this.indent()}fail: ${test.fullTitle()} - error: ${err.message}`
-        );
+        )
       })
       .once(mochaConstant.EVENT_RUN_END, () => {
-        console.log(`end: ${stats.passes}/${stats.passes + stats.failures} ok`);
-      });
+        console.log(`end: ${stats.passes}/${stats.passes + stats.failures} ok`)
+      })
   }
 
   indent() {
-    return Array(this._indents).join('  ');
+    return Array(this._indents).join('  ')
   }
 
   increaseIndent() {
-    this._indents++;
+    this._indents++
   }
 
   decreaseIndent() {
-    this._indents--;
+    this._indents--
   }
 }
 
