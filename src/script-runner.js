@@ -99,17 +99,14 @@ class MochaReporter {
       })
       .on(mochaConstant.EVENT_SUITE_END, (suite) => {
         this.decreaseIndent()
-        suite.dispose()
         if(suite.root) suite.suites = []
       })
       .on(mochaConstant.EVENT_TEST_PASS, test => {
-        // Test#fullTitle() returns the suite name(s)
-        // prepended to the test title
-        console.log(`${this.indent()}pass: ${test.fullTitle()}`)
+        console.log(`${this.indent()}pass: ${test.title}`)
       })
       .on(mochaConstant.EVENT_TEST_FAIL, (test, err) => {
         console.log(
-          `${this.indent()}fail: ${test.fullTitle()} - error: ${err.message}`
+          `${this.indent()}fail: ${test.title} - error: ${err.message}`
         )
       })
       .once(mochaConstant.EVENT_RUN_END, () => {
