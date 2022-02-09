@@ -91,22 +91,27 @@ class MochaReporter {
 
     runner
       .once(mochaConstant.EVENT_RUN_BEGIN, () => {
-        console.log('Running tests ....')
+        console.log('Running tests....')
       })
       .on(mochaConstant.EVENT_SUITE_BEGIN, (suite) => {
-        this.increaseIndent()
-        console.log(`${this.indent()}${suite.title}`)
+        if(suite.title) {
+          this.increaseIndent()
+          console.log(`${suite.title}`)
+        }
       })
       .on(mochaConstant.EVENT_SUITE_END, (suite) => {
         this.decreaseIndent()
         if(suite.root) suite.suites = []
       })
       .on(mochaConstant.EVENT_TEST_PASS, test => {
-        console.log(`${this.indent()}pass: ${test.title}`)
+        console.logInternal('EVENT_TEST_PASS---->', test)
+        console.info(`${this.indent()} ✓ ${test.title} (${test.duration} ms)`)
       })
       .on(mochaConstant.EVENT_TEST_FAIL, (test, err) => {
-        console.log(
-          `${this.indent()}fail: ${test.title} - error: ${err.message}`
+        console.logInternal('EVENT_TEST_FAIL---->', test)
+        console.logInternal('EVENT_TEST_FAIL--err-->', err)
+        console.error(
+          `${this.indent()} ✘ ${test.title} - error: ${err.message} (${test.duration} ms)`
         )
       })
       .once(mochaConstant.EVENT_RUN_END, () => {
