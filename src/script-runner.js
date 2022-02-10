@@ -15,7 +15,6 @@ const {
   EVENT_SUITE_BEGIN,
   EVENT_SUITE_END
 } = mocha._runnerClass.constants
-
 mocha.setup('bdd')
 mocha.checkLeaks()
 mocha.cleanReferencesAfterRun(false)
@@ -24,7 +23,6 @@ mocha.cleanReferencesAfterRun(false)
 class MochaReporter {
   constructor(runner) {
     const stats = runner.stats
-
     runner
       .once(EVENT_RUN_BEGIN, () => {
         console.log('Running tests....')
@@ -45,7 +43,6 @@ class MochaReporter {
         console.error(`${this.setIndent(3)} Expected: ${err.expected}`)
         console.error(`${this.setIndent(3)} Actual: ${err.actual}`)
         console.error(`${this.setIndent(3)} Message: ${err.message}`)
-
       })
       .once(EVENT_RUN_END, () => {
         console.log(`${stats.passes} passing & ${stats.failures} failing (${stats.duration} ms)`)
@@ -56,12 +53,18 @@ class MochaReporter {
     return Array(size).join('  ')
   }
 }
-
 mocha.reporter(MochaReporter)
 
 window.swarmgw = swarmgw_fn()
 window.ethers = ethers
 window.Web3 = Web3
+window.starknet = starknet
+window.chai = chai
+
+window.require = (module) => {
+  if(window[module]) return window[module]
+  else throw new Error(`${module} module require is not supported by Remix IDE`)
+}
 
 class CodeExecutor extends PluginClient {
   execute (script) {
@@ -88,9 +91,6 @@ window.web3Provider = {
   }
 }
 window.web3 = new Web3(window.web3Provider)
-
-window.starknet = starknet
-window.chai = chai
 
 console.logInternal = console.log
 console.log = function () {
