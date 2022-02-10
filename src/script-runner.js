@@ -92,6 +92,18 @@ window.web3Provider = {
 }
 window.web3 = new Web3(window.web3Provider)
 
+window.ethers.getContractFactory = (contractName) => {
+  return new Promise((resolve, reject) => {
+    window.remix.call('fileManager', 'getFile', `browser/contracts/artifacts/${contractName}.json`)
+    .then((result) => {
+      const metadata = JSON.parse(result)
+      const signer = (new ethers.providers.Web3Provider(web3Provider)).getSigner()
+      resolve(new ethers.ContractFactory(metadata.abi, metadata.data.bytecode.object, signer))
+    })
+    .catch(e => console.error(e))
+  })
+}
+
 console.logInternal = console.log
 console.log = function () {
   console.logInternal(arguments)
