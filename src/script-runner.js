@@ -23,7 +23,6 @@ mocha.cleanReferencesAfterRun(false)
 // this reporter outputs test results, indenting two spaces per suite
 class MochaReporter {
   constructor(runner) {
-    this._indents = 0
     const stats = runner.stats
 
     runner
@@ -32,22 +31,20 @@ class MochaReporter {
       })
       .on(EVENT_SUITE_BEGIN, (suite) => {
         if(suite.title) {
-          this.increaseIndent()
-          console.log(`${suite.title}`)
+          console.log(`${this.setIndent(1)} ${suite.title}`)
         }
       })
       .on(EVENT_SUITE_END, (suite) => {
-        this.decreaseIndent()
         if(suite.root) suite.suites = []
       })
       .on(EVENT_TEST_PASS, test => {
-        console.info(`${this.indent()} ✓ ${test.title} (${test.duration} ms)`)
+        console.info(`${this.setIndent(2)} ✓ ${test.title} (${test.duration} ms)`)
       })
       .on(EVENT_TEST_FAIL, (test, err) => {
-        console.error(`${this.indent()} ✘ ${test.title} (${test.duration} ms)`)
-        console.error(`${this.indent()} ${this.indent()} Expected: ${err.expected}`)
-        console.error(`${this.indent()} ${this.indent()} Actual: ${err.actual}`)
-        console.error(`${this.indent()} ${this.indent()} Message: ${err.message}`)
+        console.error(`${this.setIndent(2)} ✘ ${test.title} (${test.duration} ms)`)
+        console.error(`${this.setIndent(3)} Expected: ${err.expected}`)
+        console.error(`${this.setIndent(3)} Actual: ${err.actual}`)
+        console.error(`${this.setIndent(3)} Message: ${err.message}`)
 
       })
       .once(EVENT_RUN_END, () => {
@@ -55,16 +52,8 @@ class MochaReporter {
       })
   }
 
-  indent() {
-    return Array(this._indents).join('  ')
-  }
-
-  increaseIndent() {
-    this._indents++
-  }
-
-  decreaseIndent() {
-    this._indents--
+  setIndent(size) {
+    return Array(size).join('  ')
   }
 }
 
