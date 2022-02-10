@@ -92,15 +92,18 @@ window.web3Provider = {
 }
 window.web3 = new Web3(window.web3Provider)
 
-window.ethers.getContractFactory = (contractName) => {
+window.ethers.getContractFactory = (contractName, options) => {
+  let { artifactsPath } = options
+  artifactsPath = artifactsPath || 'browser/contracts/artifacts'
+  if (!artifactsPath.endsWith('/')) artifactsPath += '/'
   return new Promise((resolve, reject) => {
-    window.remix.call('fileManager', 'getFile', `browser/contracts/artifacts/${contractName}.json`)
+    window.remix.call('fileManager', 'getFile', `${artifactsPath}${contractName}.json`)
     .then((result) => {
       const metadata = JSON.parse(result)
       const signer = (new ethers.providers.Web3Provider(web3Provider)).getSigner()
       resolve(new ethers.ContractFactory(metadata.abi, metadata.data.bytecode.object, signer))
     })
-    .catch(e => console.error(e))
+    .catch(e => reject(e))
   })
 }
 
