@@ -40,9 +40,9 @@ class MochaReporter {
       })
       .on(EVENT_TEST_FAIL, (test, err) => {
         console.error(`${this.setIndent(2)} ✘ ${test.title} (${test.duration} ms)`)
-        console.error(`${this.setIndent(3)} Expected: ${err.expected}`)
-        console.error(`${this.setIndent(3)} Actual: ${err.actual}`)
-        console.error(`${this.setIndent(3)} Message: ${err.message}`)
+        if (err.expected) console.error(`${this.setIndent(3)} Expected: ${err.expected}`)
+        if (err.actual) console.error(`${this.setIndent(3)} Actual: ${err.actual}`)
+        if (err.message) console.error(`${this.setIndent(3)} Message: ${err.message}`)
       })
       .once(EVENT_RUN_END, () => {
         console.log(`${stats.passes} passing & ${stats.failures} failing (${stats.duration} ms)`)
@@ -93,8 +93,7 @@ window.web3Provider = {
 window.web3 = new Web3(window.web3Provider)
 
 window.ethers.getContractFactory = (contractName, options) => {
-  let { artifactsPath } = options
-  artifactsPath = artifactsPath || 'browser/contracts/artifacts'
+  let artifactsPath = options && options.artifactsPath || 'browser/contracts/artifacts'
   if (!artifactsPath.endsWith('/')) artifactsPath += '/'
   return new Promise((resolve, reject) => {
     window.remix.call('fileManager', 'getFile', `${artifactsPath}${contractName}.json`)
@@ -103,7 +102,11 @@ window.ethers.getContractFactory = (contractName, options) => {
       const signer = (new ethers.providers.Web3Provider(web3Provider)).getSigner()
       resolve(new ethers.ContractFactory(metadata.abi, metadata.data.bytecode.object, signer))
     })
-    .catch(e => reject(e))
+    .catch(e => {
+      if(e.message.includes('Error from IDE : Error: No such file or directory Cannot read file contracts/artifacts'))
+        reject (new Error(`Could not find contract artifacts. Make sure contract is compiled and 'artifactsPath' is properly configured. By default, 'artifactsPath' is 'contracts/artifacts/'`))
+      reject(e)
+    })
   })
 }
 
