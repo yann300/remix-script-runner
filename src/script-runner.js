@@ -19,7 +19,6 @@ mocha.setup('bdd')
 mocha.checkLeaks()
 mocha.cleanReferencesAfterRun(false)
 
-// this reporter outputs test results, indenting two spaces per suite
 class MochaReporter {
   constructor(runner) {
     const stats = runner.stats
@@ -92,6 +91,7 @@ window.web3Provider = {
 }
 window.web3 = new Web3(window.web3Provider)
 
+// 'getContractFactory' is added to 'ethers' to support usage of hardhat.ethers in the tests
 window.ethers.getContractFactory = (contractName, options) => {
   let artifactsPath = options && options.artifactsPath || 'browser/contracts/artifacts'
   if (!artifactsPath.endsWith('/')) artifactsPath += '/'
@@ -112,7 +112,6 @@ window.ethers.getContractFactory = (contractName, options) => {
 
 console.logInternal = console.log
 console.log = function () {
-  console.logInternal(arguments)
    window.remix.emit('log', {
      data: Array.from(arguments)
    })
@@ -120,7 +119,6 @@ console.log = function () {
 
 console.infoInternal = console.info
 console.info = function () {
-  console.infoInternal(arguments)
   window.remix.emit('info', {
     data: Array.from(arguments)
   })
@@ -128,7 +126,6 @@ console.info = function () {
 
 console.warnInternal = console.warn
 console.warn = function () {
-  console.warnInternal(arguments)
   window.remix.emit('warn', {
     data: Array.from(arguments)
   })
@@ -136,7 +133,6 @@ console.warn = function () {
 
 console.errorInternal = console.error
 console.error = function () {
-  console.errorInternal(arguments)
   window.remix.emit('error', {
     data: Array.from(arguments)
   })
