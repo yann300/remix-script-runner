@@ -92,21 +92,14 @@ window.web3Provider = {
 window.web3 = new Web3(window.web3Provider)
 
 // 'getContractFactory' is added to 'ethers' to support usage of hardhat.ethers in the tests
-window.ethers.getContractFactory = (contractName, options) => {
-  let artifactsPath = options && options.artifactsPath || 'browser/contracts/artifacts'
-  if (!artifactsPath.endsWith('/')) artifactsPath += '/'
+window.ethers.getContractFactory = (contractName) => {
   return new Promise((resolve, reject) => {
-    window.remix.call('fileManager', 'getFile', `${artifactsPath}${contractName}.json`)
+    window.remix.call('compilerArtefacts', 'getArtefactsByContractName', contractName)
     .then((result) => {
-      const metadata = JSON.parse(result)
       const signer = (new ethers.providers.Web3Provider(web3Provider)).getSigner()
-      resolve(new ethers.ContractFactory(metadata.abi, metadata.data.bytecode.object, signer))
+      resolve(new ethers.ContractFactory(result.abi, result.evm.bytecode.object, signer))
     })
-    .catch(e => {
-      if(e.message.includes('Error from IDE : Error: No such file or directory Cannot read file contracts/artifacts'))
-        reject (new Error(`Could not find contract artifacts. Make sure contract is compiled and 'artifactsPath' is properly configured. By default, 'artifactsPath' is 'contracts/artifacts/'`))
-      reject(e)
-    })
+    .catch(e => reject(e))
   })
 }
 
