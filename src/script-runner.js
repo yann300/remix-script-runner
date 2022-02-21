@@ -5,6 +5,7 @@ import { ethers } from 'ethers' // eslint-disable-line
 import Web3 from 'web3'
 import swarmgw_fn from 'swarmgw'
 import * as starknet from 'starknet'
+import * as hhEtherMethods from './hhEthers'
 const chai = require('chai')
 const mocha = require('mocha')
 const {
@@ -53,9 +54,9 @@ class MochaReporter {
   }
 }
 mocha.reporter(MochaReporter)
-
 window.swarmgw = swarmgw_fn()
 window.ethers = ethers
+for(const method in hhEtherMethods) Object.defineProperty(window.ethers, method, { value: hhEtherMethods[method]})
 window.Web3 = Web3
 window.starknet = starknet
 window.chai = chai
@@ -90,17 +91,6 @@ window.web3Provider = {
   }
 }
 window.web3 = new Web3(window.web3Provider)
-
-// 'getContractFactory' is added to 'ethers' to support usage of hardhat.ethers in the tests
-window.ethers.getContractFactory = (contractName, signer = null) => {
-  return new Promise((resolve, reject) => {
-    window.remix.call('compilerArtefacts', 'getArtefactsByContractName', contractName)
-    .then((result) => {
-      resolve(new ethers.ContractFactory(result.abi, result.evm.bytecode.object, signer || (new ethers.providers.Web3Provider(web3Provider)).getSigner()))
-    })
-    .catch(e => reject(e))
-  })
-}
 
 console.logInternal = console.log
 console.log = function () {
