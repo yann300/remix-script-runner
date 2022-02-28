@@ -1,4 +1,5 @@
 'use strict'
+import "@babel/polyfill"
 import { createClient } from '@remixproject/plugin-iframe'
 import { PluginClient } from '@remixproject/plugin'
 import { ethers } from 'ethers' // eslint-disable-line
@@ -6,7 +7,7 @@ import Web3 from 'web3'
 import swarmgw_fn from 'swarmgw'
 import * as starknet from 'starknet'
 import './runWithMocha'
-import * as hhEtherMethods from './hhEthers'
+import * as hhEtherMethods from './hardhat-ethers/methods'
 const chai = require('chai')
 
 window.swarmgw = swarmgw_fn()
@@ -14,7 +15,6 @@ window.Web3 = Web3
 window.starknet = starknet
 window.chai = chai
 window.ethers = ethers
-for(const method in hhEtherMethods) Object.defineProperty(window.ethers, method, { value: hhEtherMethods[method]})
 
 window.require = (module) => {
   if(window[module]) return window[module]
@@ -46,6 +46,12 @@ window.web3Provider = {
   }
 }
 window.web3 = new Web3(window.web3Provider)
+
+// Support hardhat-ethers, See: https://hardhat.org/plugins/nomiclabs-hardhat-ethers.html
+const hhEthers = ethers
+hhEthers.provider = new ethers.providers.Web3Provider(window.web3Provider)
+window.hardhat = { ethers: hhEthers}
+for(const method in hhEtherMethods) Object.defineProperty(window.hardhat.ethers, method, { value: hhEtherMethods[method]})
 
 console.logInternal = console.log
 console.log = function () {

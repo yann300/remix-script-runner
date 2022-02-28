@@ -1,3 +1,5 @@
+import { SignerWithAddress } from './signers'
+
 export const getContractFactory = (contractNameOrABI, bytecode=null, signer = null) => {
   return new Promise((resolve, reject) => {
     if(typeof contractNameOrABI === 'string') {
@@ -23,5 +25,12 @@ export const getContractAt = (contractNameOrABI, address, signer = null) => {
     } else {
       resolve(new ethers.Contract(address, contractNameOrABI, signer || (new ethers.providers.Web3Provider(web3Provider)).getSigner()))
     }
+  })
+}
+
+export const getSigner = (address) => {
+  return new Promise((resolve, reject) => {
+    const signer = window.hardhat.ethers.provider.getSigner(address)
+    resolve(SignerWithAddress.create(signer))
   })
 }
