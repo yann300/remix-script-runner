@@ -85,3 +85,13 @@ If you want to call a contract using ${artifact.contractName} as its interface u
 
   return getContractFactory(artifact.abi, artifact.bytecode, signerOrOptions)
 }
+
+export const getContractAtFromArtifact = (artifact, address, signerOrOptions = null) => {
+  if (!isArtifact(artifact)) {
+    throw new Error(
+      `You are trying to create a contract factory from an artifact, but you have not passed a valid artifact parameter.`
+    );
+  }
+
+  return getContractAt(artifact.abi, address, signerOrOptions)
+}
