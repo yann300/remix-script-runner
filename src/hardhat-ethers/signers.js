@@ -7,6 +7,8 @@ export class SignerWithAddress extends ethers.Signer {
 
     constructor(address, _signer) {
         super()
+        this.address = address
+        this._signer = _signer
         this.provider = _signer.provider
     }
 
