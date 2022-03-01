@@ -46,3 +46,42 @@ export const getSigners = () => {
     } catch(err) { reject(err) }
   })
 }
+
+const isArtifact = (artifact) => {
+  const {
+    contractName,
+    sourceName,
+    abi,
+    bytecode,
+    deployedBytecode,
+    linkReferences,
+    deployedLinkReferences,
+  } = artifact;
+
+  return (
+    typeof contractName === "string" &&
+    typeof sourceName === "string" &&
+    Array.isArray(abi) &&
+    typeof bytecode === "string" &&
+    typeof deployedBytecode === "string" &&
+    linkReferences !== undefined &&
+    deployedLinkReferences !== undefined
+  );
+}
+
+export const getContractFactoryFromArtifact = (artifact, signerOrOptions = null) => {
+  if (!isArtifact(artifact)) {
+    throw new Error(
+      `You are trying to create a contract factory from an artifact, but you have not passed a valid artifact parameter.`
+    );
+  }
+
+  if (artifact.bytecode === "0x") {
+    throw new Error(
+      `You are trying to create a contract factory for the contract ${artifact.contractName}, which is abstract and can't be deployed.
+If you want to call a contract using ${artifact.contractName} as its interface use the "getContractAt" function instead.`
+    );
+  }
+
+  return getContractFactory(artifact.abi, artifact.bytecode, signerOrOptions)
+}
