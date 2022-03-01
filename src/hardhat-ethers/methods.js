@@ -34,3 +34,15 @@ export const getSigner = (address) => {
     resolve(SignerWithAddress.create(signer))
   })
 }
+
+export const getSigners = () => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      const accounts = await window.hardhat.ethers.provider.listAccounts()
+      const signersWithAddress = await Promise.all(
+        accounts.map((account) => getSigner(account))
+      )
+      resolve(signersWithAddress)
+    } catch(err) { reject(err) }
+  })
+}
