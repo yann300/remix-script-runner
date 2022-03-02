@@ -1,7 +1,7 @@
 import { SignerWithAddress } from './signers'
 
 const isFactoryOptions = (signerOrOptions) => {
-  if (signerOrOptions === undefined || signerOrOptions instanceof ethers.Signer) return false
+  if (!signerOrOptions || signerOrOptions === undefined || signerOrOptions instanceof ethers.Signer) return false
   return true
 }
 
@@ -135,55 +135,56 @@ const collectLibrariesAndLink = async (artifact, libraries) => {
   return linkBytecode(artifact, [...linksToApply.values()])
 }
 
-export const getContractFactory = (contractNameOrABI, bytecode=null, signer = null) => {
-  return new Promise((resolve, reject) => {
-    if(typeof contractNameOrABI === 'string') {
-      window.remix.call('compilerArtefacts', 'getArtefactsByContractName', contractNameOrABI)
-      .then((result) => {
-        resolve(new ethers.ContractFactory(result.abi, result.evm.bytecode.object, signer || (new ethers.providers.Web3Provider(web3Provider)).getSigner()))
-      })
-      .catch(e => reject(e))
-    } else {
-      resolve(new ethers.ContractFactory(contractNameOrABI, bytecode, signer || (new ethers.providers.Web3Provider(web3Provider)).getSigner()))
-    }
-  })
+// Convert output.contracts.<filename>.<contractName> in Artifact object compatible form
+const resultToArtifact = (result) => {
+  const { fullyQualifiedName, artefact } = result
+  return {
+    contractName: fullyQualifiedName.split(':')[1],
+    sourceName: fullyQualifiedName.split(':')[0],
+    abi: artefact.abi,
+    bytecode: artefact.evm.bytecode.object,
+    deployedBytecode: artefact.evm.deployedBytecode.object,
+    linkReferences: artefact.evm.bytecode.linkReferences,
+    deployedLinkReferences: artefact.evm.deployedBytecode.linkReferences
+  }
 }
 
-export const getContractAt = (contractNameOrABI, address, signer = null) => {
-  return new Promise((resolve, reject) => {
-    if(typeof contractNameOrABI === 'string') {
-      window.remix.call('compilerArtefacts', 'getArtefactsByContractName', contractNameOrABI)
-      .then((result) => {
-        resolve(new ethers.Contract(address, result.abi, signer || (new ethers.providers.Web3Provider(web3Provider)).getSigner()))
-      })
-      .catch(e => reject(e))
-    } else {
-      resolve(new ethers.Contract(address, contractNameOrABI, signer || (new ethers.providers.Web3Provider(web3Provider)).getSigner()))
-    }
-  })
-}
-
-export const getSigner = (address) => {
-  return new Promise((resolve, reject) => {
-    const signer = window.hardhat.ethers.provider.getSigner(address)
-    resolve(SignerWithAddress.create(signer))
-  })
-}
-
-export const getSigners = () => {
-  return new Promise(async (resolve, reject) => {
+export const getContractFactory = async (contractNameOrABI, bytecode=null, signerOrOptions = null) => {
+  if(typeof contractNameOrABI === 'string') {
     try {
-      const accounts = await window.hardhat.ethers.provider.listAccounts()
-      const signersWithAddress = await Promise.all(
-        accounts.map((account) => getSigner(account))
-      )
-      resolve(signersWithAddress)
-    } catch(err) { reject(err) }
-  })
+      const result = await window.remix.call('compilerArtefacts', 'getArtefactsByContractName', contractNameOrABI)
+      return await getContractFactoryFromArtifact(resultToArtifact(result), signerOrOptions)
+    } catch(e) { throw e }
+  } else {
+    return new ethers.ContractFactory(contractNameOrABI, bytecode, signerOrOptions || (new ethers.providers.Web3Provider(web3Provider)).getSigner())
+  }
 }
 
-export const getContractFactoryFromArtifact = (artifact, signerOrOptions = null) => {
-  let libraries
+export const getContractAt = async (contractNameOrABI, address, signer = null) => {
+  if(typeof contractNameOrABI === 'string') {
+    try {
+      const result = await window.remix.call('compilerArtefacts', 'getArtefactsByContractName', contractNameOrABI)
+      return new ethers.Contract(address, result.artefact.abi, signer || (new ethers.providers.Web3Provider(web3Provider)).getSigner())
+    } catch(e) { throw e }
+  } else {
+    return new ethers.Contract(address, contractNameOrABI, signer || (new ethers.providers.Web3Provider(web3Provider)).getSigner())
+  }
+}
+
+export const getSigner = async (address) => {
+  const signer = window.hardhat.ethers.provider.getSigner(address)
+  return SignerWithAddress.create(signer)
+}
+
+export const getSigners = async () => {
+  try {
+    const accounts = await window.hardhat.ethers.provider.listAccounts()
+    return await Promise.all( accounts.map((account) => getSigner(account)))
+  } catch(err) { throw err }
+}
+
+export const getContractFactoryFromArtifact = async (artifact, signerOrOptions = null) => {
+  let libraries = {}
   let signer
 
   if (!isArtifact(artifact)) {
@@ -206,17 +207,16 @@ If you want to call a contract using ${artifact.contractName} as its interface u
     )
   }
 
-  collectLibrariesAndLink(artifact, libraries).then(linkedBytecode => {
-    return getContractFactory(artifact.abi, linkedBytecode || artifact.bytecode, signer)
-  })
+  const linkedBytecode = await collectLibrariesAndLink(artifact, libraries)
+  return new ethers.ContractFactory(artifact.abi, linkedBytecode || artifact.bytecode, signer || (new ethers.providers.Web3Provider(web3Provider)).getSigner())
 }
 
-export const getContractAtFromArtifact = (artifact, address, signerOrOptions = null) => {
+export const getContractAtFromArtifact = async (artifact, address, signerOrOptions = null) => {
   if (!isArtifact(artifact)) {
     throw new Error(
       `You are trying to create a contract factory from an artifact, but you have not passed a valid artifact parameter.`
     )
   }
 
-  return getContractAt(artifact.abi, address, signerOrOptions)
+  return await getContractAt(artifact.abi, address, signerOrOptions)
 }
