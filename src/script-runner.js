@@ -56,27 +56,27 @@ for(const method in hhEtherMethods) Object.defineProperty(window.hardhat.ethers,
 console.logInternal = console.log
 console.log = function () {
    window.remix.emit('log', {
-     data: Array.from(arguments)
+     data: Array.from(arguments).map((el) => JSON.parse(JSON.stringify(el)))
    })
  }
 
 console.infoInternal = console.info
 console.info = function () {
   window.remix.emit('info', {
-    data: Array.from(arguments)
+    data: Array.from(arguments).map((el) => JSON.parse(JSON.stringify(el)))
   })
 }
 
 console.warnInternal = console.warn
 console.warn = function () {
   window.remix.emit('warn', {
-    data: Array.from(arguments)
+    data: Array.from(arguments).map((el) => JSON.parse(JSON.stringify(el)))
   })
 }
 
 console.errorInternal = console.error
 console.error = function () {
   window.remix.emit('error', {
-    data: Array.from(arguments)
+    data: Array.from(arguments).map((el) => JSON.parse(JSON.stringify(el)))
   })
 }
