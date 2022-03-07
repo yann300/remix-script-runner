@@ -26,6 +26,9 @@ class CodeExecutor extends PluginClient {
     if (script) {
       try {
         (new Function(script))()
+        if (mocha.suite & mocha.suite.suites && mocha.suite.suites.length) {
+          mocha.run()
+        }
       } catch (e) {
         this.emit('error', {
           data: [e.message]
