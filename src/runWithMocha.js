@@ -36,7 +36,7 @@ class MochaReporter {
         if (err.message) console.error(`${this.setIndent(3)} Message: ${err.message}`)
       })
       .once(EVENT_RUN_END, () => {
-        console.log(`${stats.passes} passing & ${stats.failures} failing (${stats.duration} ms)`)
+        console.log(`${stats.passes} passing, ${stats.failures} failing (${stats.duration} ms)`)
       })
   }
 

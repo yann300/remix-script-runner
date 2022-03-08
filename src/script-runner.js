@@ -9,6 +9,7 @@ import * as starknet from 'starknet'
 import './runWithMocha'
 import * as hhEtherMethods from './hardhat-ethers/methods'
 const chai = require('chai')
+const mocha = require('mocha')
 
 window.swarmgw = swarmgw_fn()
 window.Web3 = Web3
@@ -25,10 +26,10 @@ class CodeExecutor extends PluginClient {
   execute (script) {
     if (script) {
       try {
-        (new Function(script))()
-        if (mocha.suite & mocha.suite.suites && mocha.suite.suites.length) {
+        if (mocha.suite && mocha.suite.root) {
           mocha.run()
         }
+        (new Function(script))()
       } catch (e) {
         this.emit('error', {
           data: [e.message]
