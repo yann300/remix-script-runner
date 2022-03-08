@@ -9,7 +9,6 @@ import * as starknet from 'starknet'
 import './runWithMocha'
 import * as hhEtherMethods from './hardhat-ethers/methods'
 const chai = require('chai')
-const mocha = require('mocha')
 
 window.swarmgw = swarmgw_fn()
 window.Web3 = Web3
