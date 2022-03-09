@@ -24,7 +24,10 @@ class MochaReporter {
         }
       })
       .on(EVENT_SUITE_END, (suite) => {
-        if(suite.root) suite.suites = []
+        if(suite.root) {
+          suite.suites = []
+          suite.tests = []
+        }
       })
       .on(EVENT_TEST_PASS, test => {
         console.info(`${this.setIndent(2)} ✓ ${test.title} (${test.duration} ms)`)
@@ -36,7 +39,7 @@ class MochaReporter {
         if (err.message) console.error(`${this.setIndent(3)} Message: ${err.message}`)
       })
       .once(EVENT_RUN_END, () => {
-        console.log(`${stats.passes} passing & ${stats.failures} failing (${stats.duration} ms)`)
+        console.log(`${stats.passes} passing, ${stats.failures} failing (${stats.duration} ms)`)
       })
   }
 
