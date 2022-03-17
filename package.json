@@ -21,6 +21,7 @@
     "babelify": "^10.0.0",
     "browserify": "^16.2.3",
     "chai": "^4.3.6",
+    "ethereum-waffle": "^4.0.0-alpha.0",
     "ethers": "^5.4.7",
     "fast-async": "^7.0.6",
     "mocha": "^9.2.0",
