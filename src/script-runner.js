@@ -71,8 +71,8 @@ class CodeExecutor extends PluginClient {
 
   async _resolveFile (fileName) {
     if (await this.call('fileManager', 'exists', fileName)) return await this.call('fileManager', 'readFile', fileName)
-    if (await this.call('fileManager', 'exists', fileName + '.js')) return await this.call('fileManager', 'readFile', fileName + '.js')
     if (await this.call('fileManager', 'exists', fileName + '.ts')) return await this.call('fileManager', 'readFile', fileName + '.ts')
+    if (await this.call('fileManager', 'exists', fileName + '.js')) return await this.call('fileManager', 'readFile', fileName + '.js')
   }
 
   async executeFile (fileName, fromPath) {
