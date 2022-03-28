@@ -8,6 +8,7 @@ import Web3 from 'web3'
 import swarmgw_fn from 'swarmgw'
 import * as starknet from 'starknet'
 import './runWithMocha'
+import * as path from 'path'
 import * as hhEtherMethods from './hardhat-ethers/methods'
 const chai = require('chai')
 
@@ -25,11 +26,11 @@ window.require = (module) => {
 }
 
 class CodeExecutor extends PluginClient {
-  async execute (script, filePath, fromPath) {
+  async execute (script, filePath) {
     filePath = filePath || 'scripts/script.ts'
     const paths = filePath.split('/')
     paths.pop()
-    fromPath = fromPath || paths.join('/') // get current execcution context path
+    const fromPath = paths.join('/') // get current execcution context path
     if (script) {
       try {
         script = ts.transpileModule(script, { moduleName: filePath, filePath,
@@ -46,11 +47,11 @@ class CodeExecutor extends PluginClient {
         for (const regex of array) {
           let file = regex[1]
           let absolutePath = file
-          if (file.startsWith('./')) {
-            absolutePath = paths.join('/') + file.substring(1)
+          if (file.startsWith('./') || file.startsWith('../')) {            
+            absolutePath = path.resolve(fromPath, file)
           }
           if (!scriptReturns[fromPath]) scriptReturns[fromPath] = {}
-          scriptReturns[fromPath][file] = await this.executeFile(absolutePath, fromPath)
+          scriptReturns[fromPath][file] = await this.executeFile(absolutePath)
         }
 
         // execute the script
@@ -75,12 +76,12 @@ class CodeExecutor extends PluginClient {
     if (await this.call('fileManager', 'exists', fileName + '.js')) return await this.call('fileManager', 'readFile', fileName + '.js')
   }
 
-  async executeFile (fileName, fromPath) {
+  async executeFile (fileName) {
     try {
       if (require(fileName)) return require(fileName)
     } catch (e) {}
     const content = await this._resolveFile(fileName)
-    const returns = await this.execute(content, fileName, fromPath)
+    const returns = await this.execute(content, fileName)
     return returns
   }
 }
