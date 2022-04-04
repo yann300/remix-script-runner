@@ -5,10 +5,12 @@ import { PluginClient } from '@remixproject/plugin'
 import { ethers } from 'ethers' // eslint-disable-line
 import Web3 from 'web3'
 import swarmgw_fn from 'swarmgw'
+import { waffleChai } from "@ethereum-waffle/chai";
 import * as starknet from 'starknet'
 import './runWithMocha'
 import * as hhEtherMethods from './hardhat-ethers/methods'
 const chai = require('chai')
+chai.use(waffleChai)
 
 window.swarmgw = swarmgw_fn()
 window.Web3 = Web3
