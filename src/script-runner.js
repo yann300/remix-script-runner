@@ -19,9 +19,11 @@ window.chai = chai
 window.ethers = ethers
 
 const scriptReturns = {} // keep track of modules exported values
+const fileContents = {} // keep track of file content
 window.require = (module) => {
   if (window[module]) return window[module] // library
-  if (window.__execPath__ && scriptReturns[window.__execPath__]) return scriptReturns[window.__execPath__][module] // module exported values
+  else if ((module.endsWith('.json') || module.endsWith('.abi')) && window.__execPath__ && fileContents[window.__execPath__]) return JSON.parse(fileContents[window.__execPath__][module])
+  else if (window.__execPath__ && scriptReturns[window.__execPath__]) return scriptReturns[window.__execPath__][module] // module exported values
   else throw new Error(`${module} module require is not supported by Remix IDE`)
 }
 
@@ -51,7 +53,10 @@ class CodeExecutor extends PluginClient {
             absolutePath = path.resolve(fromPath, file)
           }
           if (!scriptReturns[fromPath]) scriptReturns[fromPath] = {}
-          scriptReturns[fromPath][file] = await this.executeFile(absolutePath)
+          if (!fileContents[fromPath]) fileContents[fromPath] = {}
+          const { returns, content } = await this.executeFile(absolutePath)
+          scriptReturns[fromPath][file] = returns
+          fileContents[fromPath][file] = content
         }
 
         // execute the script
@@ -82,7 +87,7 @@ class CodeExecutor extends PluginClient {
     } catch (e) {}
     const content = await this._resolveFile(fileName)
     const returns = await this.execute(content, fileName)
-    return returns
+    return {returns, content}
   }
 }
 
