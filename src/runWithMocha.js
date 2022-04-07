@@ -10,6 +10,7 @@ const {
 mocha.setup('bdd')
 mocha.checkLeaks()
 mocha.cleanReferencesAfterRun(false)
+mocha.timeout(50000) // 50s
 
 class MochaReporter {
   constructor(runner) {
