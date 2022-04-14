@@ -45,11 +45,12 @@ class CodeExecutor extends PluginClient {
         script = script.outputText;
 
         // extract all the "require", execute them and store the returned values.
-        const regexp = /require\("(.*?)"\)/g
+        const regexp = /require\((.*?)\)/g
         const array = [...script.matchAll(regexp)];
 
         for (const regex of array) {
           let file = regex[1]
+          file = file.slice(0, -1).slice(1) // remove " and '
           let absolutePath = file
           if (file.startsWith('./') || file.startsWith('../')) {            
             absolutePath = path.resolve(fromPath, file)
@@ -63,9 +64,10 @@ class CodeExecutor extends PluginClient {
 
         // execute the script
         script = `const exports = {};
+                  const module = { exports: {} }
                   window.__execPath__ = "${fromPath}"
-                  ${script}; 
-                  return exports`
+                  ${script};
+                  return exports || module.exports`
         const returns = (new Function(script))()
         if (mocha.suite && ((mocha.suite.suites && mocha.suite.suites.length) || (mocha.suite.tests && mocha.suite.tests.length))) mocha.run()
         return returns
