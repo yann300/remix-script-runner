@@ -4,6 +4,7 @@ import * as ts from "typescript";
 import { createClient } from '@remixproject/plugin-iframe'
 import { PluginClient } from '@remixproject/plugin'
 import { ethers } from 'ethers' // eslint-disable-line
+import multihash from 'multihashes'
 import Web3 from 'web3'
 import swarmgw_fn from 'swarmgw'
 import { waffleChai } from "@ethereum-waffle/chai";
@@ -19,6 +20,7 @@ window.Web3 = Web3
 window.starknet = starknet
 window.chai = chai
 window.ethers = ethers
+window.multihashes = multihash
 
 const scriptReturns = {} // keep track of modules exported values
 const fileContents = {} // keep track of file content
