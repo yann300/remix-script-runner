@@ -3,9 +3,9 @@ import "@babel/polyfill"
 import * as ts from "typescript";
 import { createClient } from '@remixproject/plugin-iframe'
 import { PluginClient } from '@remixproject/plugin'
-import { ethers } from 'ethers' // eslint-disable-line
+import * as ethersJs from 'ethers' // eslint-disable-line
 import multihash from 'multihashes'
-import Web3 from 'web3'
+import * as web3Js from 'web3'
 import swarmgw_fn from 'swarmgw'
 import { waffleChai } from "@ethereum-waffle/chai";
 import * as starknet from 'starknet'
@@ -16,10 +16,10 @@ const chai = require('chai')
 chai.use(waffleChai)
 
 window.swarmgw = swarmgw_fn()
-window.Web3 = Web3
+window.web3 = web3Js
 window.starknet = starknet
 window.chai = chai
-window.ethers = ethers
+window.ethers = ethersJs
 window.multihashes = multihash
 
 const scriptReturns = {} // keep track of modules exported values
@@ -45,7 +45,6 @@ class CodeExecutor extends PluginClient {
          module: ts.ModuleKind.CommonJS 
         }});
         script = script.outputText;
-
         // extract all the "require", execute them and store the returned values.
         const regexp = /require\((.*?)\)/g
         const array = [...script.matchAll(regexp)];
@@ -107,12 +106,11 @@ window.web3Provider = {
       .catch(e => callback(e))
   }
 }
-window.web3 = new Web3(window.web3Provider)
 
 // Support hardhat-ethers, See: https://hardhat.org/plugins/nomiclabs-hardhat-ethers.html
-const hhEthers = ethers
-hhEthers.provider = new ethers.providers.Web3Provider(window.web3Provider)
-window.hardhat = { ethers: hhEthers}
+const { ethers } = ethersJs
+ethers.provider = new ethers.providers.Web3Provider(window.web3Provider)
+window.hardhat = { ethers }
 for(const method in hhEtherMethods) Object.defineProperty(window.hardhat.ethers, method, { value: hhEtherMethods[method]})
 
 console.logInternal = console.log
