@@ -6,6 +6,7 @@ import { PluginClient } from '@remixproject/plugin'
 import * as ethersJs from 'ethers' // eslint-disable-line
 import multihash from 'multihashes'
 import * as web3Js from 'web3'
+import Web3 from 'web3'
 import swarmgw_fn from 'swarmgw'
 import { waffleChai } from "@ethereum-waffle/chai";
 import * as starknet from 'starknet'
@@ -16,7 +17,6 @@ const chai = require('chai')
 chai.use(waffleChai)
 
 window.swarmgw = swarmgw_fn()
-window.web3 = web3Js
 window.starknet = starknet
 window.chai = chai
 window.ethers = ethersJs
@@ -25,6 +25,7 @@ window.multihashes = multihash
 const scriptReturns = {} // keep track of modules exported values
 const fileContents = {} // keep track of file content
 window.require = (module) => {
+  if (module === 'web3') return web3Js
   if (window[module]) return window[module] // library
   else if ((module.endsWith('.json') || module.endsWith('.abi')) && window.__execPath__ && fileContents[window.__execPath__]) return JSON.parse(fileContents[window.__execPath__][module])
   else if (window.__execPath__ && scriptReturns[window.__execPath__]) return scriptReturns[window.__execPath__][module] // module exported values
@@ -106,6 +107,8 @@ window.web3Provider = {
       .catch(e => callback(e))
   }
 }
+
+window.web3 = new Web3(window.web3Provider)
 
 // Support hardhat-ethers, See: https://hardhat.org/plugins/nomiclabs-hardhat-ethers.html
 const { ethers } = ethersJs
