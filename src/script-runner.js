@@ -119,6 +119,7 @@ ethers.provider = new ethers.providers.Web3Provider(window.web3Provider)
 window.hardhat = { ethers }
 for(const method in hhEtherMethods) Object.defineProperty(window.hardhat.ethers, method, { value: hhEtherMethods[method]})
 
+console.logInternal = console.log
 console.log = function () {
    window.remix.emit('log', {
      data: Array.from(arguments).map((el) => JSON.parse(JSON.stringify(el)))
