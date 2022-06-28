@@ -17,7 +17,6 @@ class MochaReporter {
     const stats = runner.stats
     runner
       .once(EVENT_RUN_BEGIN, () => {
-        console.log('Running tests....')
       })
       .on(EVENT_SUITE_BEGIN, (suite) => {
         if(suite.title) {
@@ -35,12 +34,14 @@ class MochaReporter {
       })
       .on(EVENT_TEST_FAIL, (test, err) => {
         console.error(`${this.setIndent(2)} ✘ ${test.title} (${test.duration} ms)`)
-        if (err.expected) console.error(`${this.setIndent(3)} Expected: ${err.expected}`)
-        if (err.actual) console.error(`${this.setIndent(3)} Actual: ${err.actual}`)
+        if (err.expected) console.info(`${this.setIndent(3)} - Expected: ${err.expected}`)
+        if (err.actual) console.error(`${this.setIndent(3)} + Received: ${err.actual}`)
         if (err.message) console.error(`${this.setIndent(3)} Message: ${err.message}`)
       })
       .once(EVENT_RUN_END, () => {
-        console.log(`${stats.passes} passing, ${stats.failures} failing (${stats.duration} ms)`)
+        console.info(`Passed: ${stats.passes}`)
+        console.error(`Failed: ${stats.failures}`)
+        console.log(`Time Taken: ${stats.duration} ms`)
       })
   }
 

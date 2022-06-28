@@ -71,7 +71,10 @@ class CodeExecutor extends PluginClient {
                   ${script};
                   return exports || module.exports`
         const returns = (new Function(script))()
-        if (mocha.suite && ((mocha.suite.suites && mocha.suite.suites.length) || (mocha.suite.tests && mocha.suite.tests.length))) mocha.run()
+        if (mocha.suite && ((mocha.suite.suites && mocha.suite.suites.length) || (mocha.suite.tests && mocha.suite.tests.length))) {
+          console.log(`RUNS ${filePath}....`)
+          mocha.run()
+        } 
         return returns
       } catch (e) {
         this.emit('error', {
