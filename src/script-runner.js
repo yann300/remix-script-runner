@@ -71,7 +71,10 @@ class CodeExecutor extends PluginClient {
                   ${script};
                   return exports || module.exports`
         const returns = (new Function(script))()
-        if (mocha.suite && ((mocha.suite.suites && mocha.suite.suites.length) || (mocha.suite.tests && mocha.suite.tests.length))) mocha.run()
+        if (mocha.suite && ((mocha.suite.suites && mocha.suite.suites.length) || (mocha.suite.tests && mocha.suite.tests.length))) {
+          console.log(`RUNS ${filePath}....`)
+          mocha.run()
+        } 
         return returns
       } catch (e) {
         this.emit('error', {
@@ -116,7 +119,6 @@ ethers.provider = new ethers.providers.Web3Provider(window.web3Provider)
 window.hardhat = { ethers }
 for(const method in hhEtherMethods) Object.defineProperty(window.hardhat.ethers, method, { value: hhEtherMethods[method]})
 
-console.logInternal = console.log
 console.log = function () {
    window.remix.emit('log', {
      data: Array.from(arguments).map((el) => JSON.parse(JSON.stringify(el)))
