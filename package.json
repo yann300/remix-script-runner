@@ -26,7 +26,7 @@
     "fast-async": "^7.0.6",
     "mocha": "^9.2.0",
     "multihashes": "^4.0.3",
-    "starknet": "^2.0.1",
+    "starknet": "^3.15.0",
     "swarmgw": "^0.3.1",
     "typescript": "^4.6.2",
     "web3": "^1.5.3"
