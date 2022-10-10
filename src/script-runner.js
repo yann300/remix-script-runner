@@ -10,6 +10,7 @@ import Web3 from 'web3'
 import swarmgw_fn from 'swarmgw'
 import { waffleChai } from "@ethereum-waffle/chai";
 import * as starknet from 'starknet'
+import * as zokratesJs from 'zokrates-js';
 import './runWithMocha'
 import * as path from 'path'
 import * as hhEtherMethods from './hardhat-ethers/methods'
@@ -21,6 +22,7 @@ window.starknet = starknet
 window.chai = chai
 window.ethers = ethersJs
 window.multihashes = multihash
+window['zokrates-js'] = zokratesJs
 
 const scriptReturns = {} // keep track of modules exported values
 const fileContents = {} // keep track of file content
