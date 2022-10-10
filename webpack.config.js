@@ -17,7 +17,6 @@ module.exports = {
     }
   },
   experiments: {
-    asyncWebAssembly: true,
     syncWebAssembly: true
   },
   plugins: [
