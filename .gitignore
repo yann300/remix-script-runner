@@ -1,2 +1,3 @@
 node_modules
-build/script-runner.js
+build/
+!build/index.html

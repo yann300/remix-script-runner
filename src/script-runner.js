@@ -45,7 +45,8 @@ class CodeExecutor extends PluginClient {
         script = ts.transpileModule(script, { moduleName: filePath, filePath,
         compilerOptions: {
          target: ts.ScriptTarget.ES2015,
-         module: ts.ModuleKind.CommonJS 
+         module: ts.ModuleKind.CommonJS,
+         esModuleInterop: true,  
         }});
         script = script.outputText;
         // extract all the "require", execute them and store the returned values.
