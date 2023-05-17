@@ -113,6 +113,8 @@ window.web3Provider = {
       .catch(e => callback(e))
   }
 }
+window.provider = web3Provider
+window.ethereum = web3Provider
 
 window.web3 = new Web3(window.web3Provider)
 
