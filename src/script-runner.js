@@ -23,6 +23,7 @@ window.chai = chai
 window.ethers = ethersJs
 window.multihashes = multihash
 window['zokrates-js'] = zokratesJs
+window['snarkjs'] = snarkjs
 
 const scriptReturns = {} // keep track of modules exported values
 const fileContents = {} // keep track of file content
