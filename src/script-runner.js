@@ -14,6 +14,13 @@ import * as zokratesJs from 'zokrates-js';
 import './runWithMocha'
 import * as path from 'path'
 import * as hhEtherMethods from './hardhat-ethers/methods'
+// import * as semaphoreContracts from '@semaphore-protocol/contracts'
+import * as semaphoreData from '@semaphore-protocol/data'
+import * as semaphoreGroup from '@semaphore-protocol/group'
+import * as semaphoreIdentity from '@semaphore-protocol/identity'
+import * as semaphoreProof from '@semaphore-protocol/proof'
+// import * as semaphoreHeyauthn from '@semaphore-protocol/heyauthn'
+// import * as semaphoreSubgraph from '@semaphore-protocol/subgraph'
 const chai = require('chai')
 chai.use(waffleChai)
 
@@ -24,6 +31,14 @@ window.ethers = ethersJs
 window.multihashes = multihash
 window['zokrates-js'] = zokratesJs
 window['snarkjs'] = snarkjs
+
+// window['@semaphore-protocol/contracts'] = semaphoreContracts
+window['@semaphore-protocol/data'] = semaphoreData
+window['@semaphore-protocol/group'] = semaphoreGroup
+window['@semaphore-protocol/identity'] = semaphoreIdentity
+window['@semaphore-protocol/proof'] = semaphoreProof
+// window['@semaphore-protocol/heyauthn'] = semaphoreHeyauthn
+// window['@semaphore-protocol/subgraph'] = semaphoreSubgraph
 
 const scriptReturns = {} // keep track of modules exported values
 const fileContents = {} // keep track of file content

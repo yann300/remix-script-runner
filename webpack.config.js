@@ -14,6 +14,10 @@ module.exports = {
       stream: require.resolve("stream-browserify"),
       process: "process/browser",
       buffer: require.resolve("buffer"),
+      fs: false
+    },
+    fallback: {
+      fs: false
     }
   },
   experiments: {
