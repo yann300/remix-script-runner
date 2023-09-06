@@ -11,6 +11,8 @@ import swarmgw_fn from 'swarmgw'
 import { waffleChai } from "@ethereum-waffle/chai";
 import * as starknet from 'starknet'
 import * as zokratesJs from 'zokrates-js';
+import * as circomlibjs from 'circomlibjs';
+import * as zkkitIncrementalMerkleTree from '@zk-kit/incremental-merkle-tree';
 import './runWithMocha'
 import * as path from 'path'
 import * as hhEtherMethods from './hardhat-ethers/methods'
@@ -24,6 +26,8 @@ window.ethers = ethersJs
 window.multihashes = multihash
 window['zokrates-js'] = zokratesJs
 window['snarkjs'] = snarkjs
+window['circomlibjs'] = circomlibjs
+window['@zk-kit/incremental-merkle-tree'] = zkkitIncrementalMerkleTree
 
 const scriptReturns = {} // keep track of modules exported values
 const fileContents = {} // keep track of file content
