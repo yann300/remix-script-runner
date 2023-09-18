@@ -22,22 +22,18 @@ module.exports = {
       http: require.resolve("stream-http"),
       https: require.resolve("https-browserify"),
       zlib: false
+    },
+    alias: {
+      process: 'process/browser',
     }
   },
   experiments: {
     syncWebAssembly: true
   },
   plugins: [
-    new webpack.ProvidePlugin({            
-            Buffer: ["buffer", "Buffer"],
-        }),
-    new webpack.DefinePlugin({
-            'process': {
-              browser: true,
-              env: {
-                NODE_DEBUG: false
-              }
-            }
-      })
-    ]
+    new webpack.ProvidePlugin({
+      Buffer: ["buffer", "Buffer"],
+      process: 'process/browser',
+    })
+  ]
 };
