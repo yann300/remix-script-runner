@@ -1,4 +1,13 @@
 /*
+ * [js-sha512]{@link https://github.com/emn178/js-sha512}
+ *
+ * @version 0.8.0
+ * @author Chen, Yi-Cyuan [emn178@gmail.com]
+ * @copyright Chen, Yi-Cyuan 2014-2018
+ * @license MIT
+ */
+
+/*
 object-assign
 (c) Sindre Sorhus
 @license MIT
@@ -599,13 +608,43 @@ PERFORMANCE OF THIS SOFTWARE.
 
 /*! https://mths.be/he v1.2.0 by @mathias | MIT license */
 
+/*! https://mths.be/punycode v1.4.1 by @mathias */
+
 /*! https://mths.be/utf8js v3.0.0 by @mathias */
 
 /*! ieee754. BSD-3-Clause License. Feross Aboukhadijeh <https://feross.org/opensource> */
 
+/*! noble-curves - MIT License (c) 2022 Paul Miller (paulmillr.com) */
+
 /*! noble-hashes - MIT License (c) 2022 Paul Miller (paulmillr.com) */
 
 /*! safe-buffer. MIT License. Feross Aboukhadijeh <https://feross.org/opensource> */
+
+/**
+ * @file Embedded JavaScript templating engine. {@link http://ejs.co}
+ * @author Matthew Eernisse <mde@fleegix.org>
+ * @author Tiancheng "Timothy" Gu <timothygu99@gmail.com>
+ * @project EJS
+ * @license {@link http://www.apache.org/licenses/LICENSE-2.0 Apache License, Version 2.0}
+ */
+
+/**
+ * @module @semaphore-protocol/group
+ * @version 3.11.0
+ * @file A library to create and manage Semaphore groups.
+ * @copyright Ethereum Foundation 2022
+ * @license MIT
+ * @see [Github]{@link https://github.com/semaphore-protocol/semaphore/tree/main/packages/group}
+*/
+
+/**
+ * @module @zk-kit/incremental-merkle-tree
+ * @version 1.1.0
+ * @file Incremental Merkle tree implementation in TypeScript.
+ * @copyright Cedoor 2023
+ * @license MIT
+ * @see [Github]{@link https://github.com/privacy-scaling-explorations/zk-kit/tree/main/packages/incremental-merkle-tree}
+*/
 
 /**
  * [js-sha3]{@link https://github.com/emn178/js-sha3}

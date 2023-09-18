@@ -7,23 +7,35 @@ import * as ethersJs from 'ethers' // eslint-disable-line
 import multihash from 'multihashes'
 import * as web3Js from 'web3'
 import Web3 from 'web3'
-import swarmgw_fn from 'swarmgw'
 import { waffleChai } from "@ethereum-waffle/chai";
 import * as starknet from 'starknet'
 import * as zokratesJs from 'zokrates-js';
+import * as circomlibjs from 'circomlibjs';
+const snarkjs = require('snarkjs');
+import * as zkkitIncrementalMerkleTree from '@zk-kit/incremental-merkle-tree';
+import * as semaphoreProtocolProof from '@semaphore-protocol/proof'
+// import * as semaphoreProtocolContracts from '@semaphore-protocol/contracts'
+import * as semaphoreProtocolGroup from '@semaphore-protocol/group'
+import * as semaphoreProtocolIdentity from '@semaphore-protocol/identity'
 import './runWithMocha'
 import * as path from 'path'
 import * as hhEtherMethods from './hardhat-ethers/methods'
 const chai = require('chai')
 chai.use(waffleChai)
 
-window.swarmgw = swarmgw_fn()
 window.starknet = starknet
 window.chai = chai
 window.ethers = ethersJs
 window.multihashes = multihash
 window['zokrates-js'] = zokratesJs
 window['snarkjs'] = snarkjs
+window['circomlibjs'] = circomlibjs
+window['@zk-kit/incremental-merkle-tree'] = zkkitIncrementalMerkleTree
+
+window['@semaphore-protocol/proof'] = semaphoreProtocolProof
+// window['@semaphore-protocol/contracts'] = semaphoreProtocolContracts
+window['@semaphore-protocol/group'] = semaphoreProtocolGroup
+window['@semaphore-protocol/identity'] = semaphoreProtocolIdentity
 
 const scriptReturns = {} // keep track of modules exported values
 const fileContents = {} // keep track of file content
