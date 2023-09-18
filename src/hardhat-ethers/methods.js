@@ -34,9 +34,9 @@ function linkBytecode(artifact, libraries) {
     const linkReferences = artifact.linkReferences[sourceName][libraryName]
     for (const { start, length } of linkReferences) {
       bytecode =
-        bytecode.substr(0, 2 + start * 2) +
-        address.substr(2) +
-        bytecode.substr(2 + (start + length) * 2)
+        bytecode.substring(0, 2 * start) +
+        address.replace('0x', '') +
+        bytecode.substring(2 * start + 2 * length)
     }
   }
 
