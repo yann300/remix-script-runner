@@ -2,12 +2,14 @@ const path = require('path');
 const webpack = require('webpack')
 
 module.exports = {
+  mode: 'development',
   entry: './src/script-runner.js',
   target: ['web'],
   output: {
     filename: './script-runner.js',
     path: path.resolve(__dirname, 'build')
   },
+  devtool: 'source-map',
   resolve: {
     fallback: {
       assert: false,
@@ -21,7 +23,19 @@ module.exports = {
       constants: require.resolve("constants-browserify"),
       http: require.resolve("stream-http"),
       https: require.resolve("https-browserify"),
-      zlib: false
+      zlib: false,
+      v8: require.resolve("./polyfills/v8.js"),
+      net: require.resolve("net-browserify"),
+      querystring: require.resolve("querystring-es3"),
+      tty: require.resolve("tty-browserify"),
+      module: false,
+      worker_threads: false,
+      child_process: false,
+      'timers/promises': false,
+      '@yarnpkg/cli': false,
+      dns: false,
+      async_hooks: false,
+      stream: require.resolve('stream-browserify')
     },
     alias: {
       process: 'process/browser',

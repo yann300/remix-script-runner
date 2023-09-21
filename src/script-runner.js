@@ -3,56 +3,48 @@ import "@babel/polyfill"
 import * as ts from "typescript";
 import { createClient } from '@remixproject/plugin-iframe'
 import { PluginClient } from '@remixproject/plugin'
-import * as ethersJs from 'ethers' // eslint-disable-line
-import multihash from 'multihashes'
-import * as web3Js from 'web3'
 import Web3 from 'web3'
 import { waffleChai } from "@ethereum-waffle/chai";
-import * as starknet from 'starknet'
-import * as zokratesJs from 'zokrates-js';
-import * as circomlibjs from 'circomlibjs';
-const snarkjs = require('snarkjs');
-import * as zkkitIncrementalMerkleTree from '@zk-kit/incremental-merkle-tree';
-import * as semaphoreProtocolProof from '@semaphore-protocol/proof'
-// import * as semaphoreProtocolContracts from '@semaphore-protocol/contracts'
-import * as semaphoreProtocolGroup from '@semaphore-protocol/group'
-import * as semaphoreProtocolIdentity from '@semaphore-protocol/identity'
 import './runWithMocha'
 import * as path from 'path'
 import * as hhEtherMethods from './hardhat-ethers/methods'
+import { yarnLoader, yarnContext } from './yarn/yarn-loader'
 const chai = require('chai')
 chai.use(waffleChai)
 
-window.starknet = starknet
 window.chai = chai
-window.ethers = ethersJs
-window.multihashes = multihash
-window['zokrates-js'] = zokratesJs
-window['snarkjs'] = snarkjs
-window['circomlibjs'] = circomlibjs
-window['@zk-kit/incremental-merkle-tree'] = zkkitIncrementalMerkleTree
 
-window['@semaphore-protocol/proof'] = semaphoreProtocolProof
-// window['@semaphore-protocol/contracts'] = semaphoreProtocolContracts
-window['@semaphore-protocol/group'] = semaphoreProtocolGroup
-window['@semaphore-protocol/identity'] = semaphoreProtocolIdentity
+let currentStopWatch = 0
 
 const scriptReturns = {} // keep track of modules exported values
 const fileContents = {} // keep track of file content
-window.require = (module) => {
-  if (module === 'web3') return web3Js
-  if (window[module]) return window[module] // library
-  else if ((module.endsWith('.json') || module.endsWith('.abi')) && window.__execPath__ && fileContents[window.__execPath__]) return JSON.parse(fileContents[window.__execPath__][module])
-  else if (window.__execPath__ && scriptReturns[window.__execPath__]) return scriptReturns[window.__execPath__][module] // module exported values
-  else throw new Error(`${module} module require is not supported by Remix IDE`)
+window.require = (module) => {  
+  if ((module.endsWith('.json') || module.endsWith('.abi')) && window.__execPath__ && fileContents[window.__execPath__]) return JSON.parse(fileContents[window.__execPath__][module])
+  else if (window.__execPath__ && scriptReturns[window.__execPath__]) {
+    let returns = scriptReturns[window.__execPath__][module] || scriptReturns[window.__execPath__][module + '.js'] // module exported values
+    if (module === 'ethers') {
+      // Support hardhat-ethers, See: https://hardhat.org/plugins/nomiclabs-hardhat-ethers.html
+      returns.provider = new ethers.providers.Web3Provider(window.web3Provider)
+      for(const method in hhEtherMethods) Object.defineProperty(returns, method, { value: hhEtherMethods[method]})
+    }
+    return returns
+  } else {
+    throw new Error(`${module} module require is not supported by Remix IDE`)    
+  }
 }
 
 class CodeExecutor extends PluginClient {
+  onActivation () {
+    this.on('filePanel', 'setWorkspace', (workspace) => {
+      console.log('opening a new workspace in script runner ', workspace)
+      yarnLoader(this)
+    })
+  }
   async execute (script, filePath) {
     filePath = filePath || 'scripts/script.ts'
     const paths = filePath.split('/')
     paths.pop()
-    const fromPath = paths.join('/') // get current execcution context path
+    const fromPath = paths.join('/') // get current execution context path
     if (script) {
       try {
         script = ts.transpileModule(script, { moduleName: filePath, filePath,
@@ -76,16 +68,22 @@ class CodeExecutor extends PluginClient {
           if (!scriptReturns[fromPath]) scriptReturns[fromPath] = {}
           if (!fileContents[fromPath]) fileContents[fromPath] = {}
           const { returns, content } = await this.executeFile(absolutePath)
+          
           scriptReturns[fromPath][file] = returns
           fileContents[fromPath][file] = content
         }
 
         // execute the script
-        script = `const exports = {};
-                  const module = { exports: {} }
+        script = `let exports = {};
+                  let module = { exports: {} }
                   window.__execPath__ = "${fromPath}"
                   ${script};
-                  return exports || module.exports`
+                  if (Object.keys(exports).length) {
+                    return exports
+                  } else {
+                    return module.exports
+                  }
+                  `
         const returns = (new Function(script))()
         if (mocha.suite && ((mocha.suite.suites && mocha.suite.suites.length) || (mocha.suite.tests && mocha.suite.tests.length))) {
           console.log(`RUNS ${filePath}....`)
@@ -100,18 +98,84 @@ class CodeExecutor extends PluginClient {
     }
   }
 
+  async _resolveRemixFileSystem(fileName) {
+    if (await this.call('fileManager', 'exists', fileName)) return { content: await this.call('fileManager', 'readFile', fileName) }
+    if (await this.call('fileManager', 'exists', fileName + '.ts')) return { content: await this.call('fileManager', 'readFile', fileName + '.ts') }
+    if (await this.call('fileManager', 'exists', fileName + '.js')) return { content: await this.call('fileManager', 'readFile', fileName + '.js') }
+    return {content: null}
+  }
+
+  async _resolveYarnFileSystem(fileName) {
+    let path = fileName.indexOf('/app/node_modules/') !== -1 ? fileName : `/app/node_modules/${fileName}`
+    let content
+    let isDirectory = false
+    try {
+      isDirectory = yarnContext.memfs.lstatSync(path).isDirectory()
+    } catch (e) {}
+    
+    if (isDirectory) {
+      let main = null
+
+      // main property of package.json
+      const packageJson = `/app/node_modules/${fileName}/package.json`
+      const isFile = yarnContext.memfs.lstatSync(packageJson).isFile()
+      if (isFile) {
+        const json = JSON.parse(yarnContext.memfs.readFileSync(packageJson, { encoding: 'utf8' }))
+        if (json.main) main = `/app/node_modules/${fileName}/${json.main}`
+      }
+
+      if (!main) {
+        // looking for an entry point
+        const hasDistDirectory = yarnContext.memfs.lstatSync(`/app/node_modules/${fileName}/dist`).isDirectory()    
+        if (hasDistDirectory) {
+          // dist folder
+          const hasDistBuild = yarnContext.memfs.lstatSync(`/app/node_modules/${fileName}/dist/${fileName}.js`).isFile()
+          if (hasDistBuild) main = `/app/node_modules/${fileName}/dist/${fileName}.js`
+        }
+      }
+      
+      if (main) {
+        content = yarnContext.memfs.readFileSync(main, { encoding: 'utf8' })
+        return  { content, path: main }
+      }      
+      return { content: null} 
+    }
+    
+    let isFile = false
+    try {
+      isFile = yarnContext.memfs.lstatSync(path).isFile()
+    } catch (e) {}
+    
+    if (isFile) {
+      content = yarnContext.memfs.readFileSync(path, { encoding: 'utf8' })
+      return { content, path } 
+    }
+
+    if (!path.endsWith('.js')) path = path + '.js'
+    try {
+      isFile = yarnContext.memfs.lstatSync(path).isFile()
+    } catch (e) {}
+    
+    if (isFile) {
+      content = yarnContext.memfs.readFileSync(path, { encoding: 'utf8' })
+      return { content, path } 
+    }
+    return { content: null }
+  }
+
   async _resolveFile (fileName) {
-    if (await this.call('fileManager', 'exists', fileName)) return await this.call('fileManager', 'readFile', fileName)
-    if (await this.call('fileManager', 'exists', fileName + '.ts')) return await this.call('fileManager', 'readFile', fileName + '.ts')
-    if (await this.call('fileManager', 'exists', fileName + '.js')) return await this.call('fileManager', 'readFile', fileName + '.js')
+    const { content, path } = await this._resolveRemixFileSystem(fileName)
+    if (content) return { content, path }
+    const ret = await this._resolveYarnFileSystem(fileName)
+    return ret
   }
 
   async executeFile (fileName) {
     try {
       if (require(fileName)) return require(fileName)
     } catch (e) {}
-    const content = await this._resolveFile(fileName)
-    const returns = await this.execute(content, fileName)
+    const { content, path } = await this._resolveFile(fileName)
+    const returns = await this.execute(content, path || fileName)
     return {returns, content}
   }
 }
@@ -131,36 +195,30 @@ window.ethereum = web3Provider
 
 window.web3 = new Web3(window.web3Provider)
 
-// Support hardhat-ethers, See: https://hardhat.org/plugins/nomiclabs-hardhat-ethers.html
-const { ethers } = ethersJs
-ethers.provider = new ethers.providers.Web3Provider(window.web3Provider)
-window.hardhat = { ethers }
-for(const method in hhEtherMethods) Object.defineProperty(window.hardhat.ethers, method, { value: hhEtherMethods[method]})
-
 console.logInternal = console.log
 console.log = function () {
    window.remix.emit('log', {
-     data: Array.from(arguments).map((el) => JSON.parse(JSON.stringify(el)))
+     data: Array.from(arguments).map((el) => el ? JSON.parse(JSON.stringify(el)) : 'undefined')
    })
  }
 
 console.infoInternal = console.info
 console.info = function () {
   window.remix.emit('info', {
-    data: Array.from(arguments).map((el) => JSON.parse(JSON.stringify(el)))
+    data: Array.from(arguments).map((el) => el ? JSON.parse(JSON.stringify(el)) : 'undefined')
   })
 }
 
 console.warnInternal = console.warn
 console.warn = function () {
   window.remix.emit('warn', {
-    data: Array.from(arguments).map((el) => JSON.parse(JSON.stringify(el)))
+    data: Array.from(arguments).map((el) => el ? JSON.parse(JSON.stringify(el)) : 'undefined')
   })
 }
 
 console.errorInternal = console.error
 console.error = function () {
   window.remix.emit('error', {
-    data: Array.from(arguments).map((el) => JSON.parse(JSON.stringify(el)))
+    data: Array.from(arguments).map((el) => el ? JSON.parse(JSON.stringify(el)) : 'undefined')
   })
 }
