@@ -1,7 +1,7 @@
 #!/bin/bash
 
 set -e
-SHA = $(git rev-parse --short --verify HEAD)
+SHA=$(git rev-parse --short --verify HEAD)
 git checkout gh-pages
 git checkout master -- build/
 git checkout master -- package.json
