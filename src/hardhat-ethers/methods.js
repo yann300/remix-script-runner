@@ -36,7 +36,7 @@ function linkBytecode(artifact, libraries) {
       bytecode =
         bytecode.substring(0, 2 * start) +
         address.replace('0x', '') +
-        bytecode.substring(2 * start + 2 * length)
+        bytecode.replace('0x', '').substring(2 * start + 2 * length)
     }
   }
 
