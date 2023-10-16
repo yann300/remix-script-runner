@@ -21,7 +21,8 @@ module.exports = {
       constants: require.resolve("constants-browserify"),
       http: require.resolve("stream-http"),
       https: require.resolve("https-browserify"),
-      zlib: false
+      zlib: false,
+      'child_process': false
     },
     alias: {
       process: 'process/browser',
