@@ -18,6 +18,7 @@
     "@babel/register": "^7.4.4",
     "@chainlink/functions-toolkit": "^0.2.6",
     "@ethereum-waffle/chai": "^3.4.4",
+    "@personaelabs/spartan-ecdsa": "^2.3.1",
     "@remixproject/plugin": "^0.3.1",
     "@remixproject/plugin-iframe": "^0.3.1",
     "@semaphore-protocol/contracts": "^3.11.0",
