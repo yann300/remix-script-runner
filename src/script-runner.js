@@ -19,6 +19,7 @@ import * as semaphoreProtocolGroup from '@semaphore-protocol/group'
 import * as semaphoreProtocolIdentity from '@semaphore-protocol/identity'
 import * as semaphoreProtocolData from '@semaphore-protocol/data'
 import * as chainlinkFunction from '@chainlink/functions-toolkit'
+import * as spartanECDSA from '@personaelabs/spartan-ecdsa'
 import './runWithMocha'
 import * as path from 'path'
 import * as hhEtherMethods from './hardhat-ethers/methods'
@@ -42,6 +43,7 @@ window['@semaphore-protocol/identity'] = semaphoreProtocolIdentity
 window['@semaphore-protocol/data'] = semaphoreProtocolData
 
 window['@chainlink/functions-toolkit'] = chainlinkFunction
+window['@personaelabs/spartan-ecdsa'] = spartanECDSA
 
 const scriptReturns = {} // keep track of modules exported values
 const fileContents = {} // keep track of file content
