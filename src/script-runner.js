@@ -18,9 +18,12 @@ import * as semaphoreProtocolProof from '@semaphore-protocol/proof'
 import * as semaphoreProtocolGroup from '@semaphore-protocol/group'
 import * as semaphoreProtocolIdentity from '@semaphore-protocol/identity'
 import * as semaphoreProtocolData from '@semaphore-protocol/data'
+import * as chainlinkFunction from '@chainlink/functions-toolkit'
+import * as spartanECDSA from '@personaelabs/spartan-ecdsa'
 import './runWithMocha'
 import * as path from 'path'
 import * as hhEtherMethods from './hardhat-ethers/methods'
+import { isBigInt } from 'web3-validator'
 const chai = require('chai')
 chai.use(waffleChai)
 
@@ -38,6 +41,9 @@ window['@semaphore-protocol/proof'] = semaphoreProtocolProof
 window['@semaphore-protocol/group'] = semaphoreProtocolGroup
 window['@semaphore-protocol/identity'] = semaphoreProtocolIdentity
 window['@semaphore-protocol/data'] = semaphoreProtocolData
+
+window['@chainlink/functions-toolkit'] = chainlinkFunction
+window['@personaelabs/spartan-ecdsa'] = spartanECDSA
 
 const scriptReturns = {} // keep track of modules exported values
 const fileContents = {} // keep track of file content
@@ -139,30 +145,35 @@ ethers.provider = new ethers.providers.Web3Provider(window.web3Provider)
 window.hardhat = { ethers }
 for(const method in hhEtherMethods) Object.defineProperty(window.hardhat.ethers, method, { value: hhEtherMethods[method]})
 
+const replacer = (key, value) => {
+  if (isBigInt(value)) value = value.toString()
+  if (typeof value === 'function') value = value.toString()
+  return value
+}
 console.logInternal = console.log
 console.log = function () {
    window.remix.emit('log', {
-     data: Array.from(arguments).map((el) => JSON.parse(JSON.stringify(el)))
+     data: Array.from(arguments).map((el) => JSON.parse(JSON.stringify(el, replacer)))
    })
  }
 
 console.infoInternal = console.info
 console.info = function () {
   window.remix.emit('info', {
-    data: Array.from(arguments).map((el) => JSON.parse(JSON.stringify(el)))
+    data: Array.from(arguments).map((el) => JSON.parse(JSON.stringify(el, replacer)))
   })
 }
 
 console.warnInternal = console.warn
 console.warn = function () {
   window.remix.emit('warn', {
-    data: Array.from(arguments).map((el) => JSON.parse(JSON.stringify(el)))
+    data: Array.from(arguments).map((el) => JSON.parse(JSON.stringify(el, replacer)))
   })
 }
 
 console.errorInternal = console.error
 console.error = function () {
   window.remix.emit('error', {
-    data: Array.from(arguments).map((el) => JSON.parse(JSON.stringify(el)))
+    data: Array.from(arguments).map((el) => JSON.parse(JSON.stringify(el, replacer)))
   })
 }
