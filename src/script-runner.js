@@ -20,6 +20,7 @@ import * as semaphoreProtocolIdentity from '@semaphore-protocol/identity'
 import * as semaphoreProtocolData from '@semaphore-protocol/data'
 import * as chainlinkFunction from '@chainlink/functions-toolkit'
 import * as spartanECDSA from '@personaelabs/spartan-ecdsa'
+import * as ethereumjsUtil from '@ethereumjs/util'
 import './runWithMocha'
 import * as path from 'path'
 import * as hhEtherMethods from './hardhat-ethers/methods'
@@ -45,6 +46,7 @@ window['@semaphore-protocol/data'] = semaphoreProtocolData
 
 window['@chainlink/functions-toolkit'] = chainlinkFunction
 window['@personaelabs/spartan-ecdsa'] = spartanECDSA
+window['@ethereumjs/util'] = ethereumjsUtil
 
 window["ffjavascript"] = ffjavascript
 
