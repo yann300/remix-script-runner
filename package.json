@@ -41,6 +41,7 @@
     "node-polyfill-webpack-plugin": "^2.0.1",
     "path-browserify": "^1.0.1",
     "process": "^0.11.10",
+    "sindri": "0.0.1-alpha.27",
     "snarkjs": "0.7.0",
     "starknet": "^5.19.5",
     "stream-browserify": "^3.0.0",

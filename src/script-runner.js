@@ -24,6 +24,7 @@ import './runWithMocha'
 import * as path from 'path'
 import * as hhEtherMethods from './hardhat-ethers/methods'
 import * as ffjavascript from 'ffjavascript'
+import * as sindri from 'sindri'
 import { isBigInt } from 'web3-validator'
 const chai = require('chai')
 chai.use(waffleChai)
@@ -47,6 +48,8 @@ window['@chainlink/functions-toolkit'] = chainlinkFunction
 window['@personaelabs/spartan-ecdsa'] = spartanECDSA
 
 window["ffjavascript"] = ffjavascript
+
+window["sindri"] = sindri
 
 const scriptReturns = {} // keep track of modules exported values
 const fileContents = {} // keep track of file content
