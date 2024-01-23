@@ -9,23 +9,11 @@ module.exports = {
     path: path.resolve(__dirname, 'build')
   },
   resolve: {
-    fallback: {
-      assert: false,
+    alias: {
       path: require.resolve("path-browserify"),
       stream: require.resolve("stream-browserify"),
-      'process/browser': require.resolve("process/browser"),
+      process: "process/browser",
       buffer: require.resolve("buffer"),
-      fs: false,
-      os: false,
-      crypto: require.resolve("crypto-browserify"),
-      constants: require.resolve("constants-browserify"),
-      http: require.resolve("stream-http"),
-      https: require.resolve("https-browserify"),
-      zlib: false,
-      'child_process': false
-    },
-    alias: {
-      process: 'process/browser',
     }
   },
   experiments: {
@@ -33,8 +21,8 @@ module.exports = {
   },
   plugins: [
     new webpack.ProvidePlugin({
-      Buffer: ["buffer", "Buffer"],
-      process: 'process/browser',
-    })
-  ]
+            process: 'process/browser',
+            Buffer: ["buffer", "Buffer"],
+        })
+    ]
 };
