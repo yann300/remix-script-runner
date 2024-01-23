@@ -7,22 +7,51 @@ import * as ethersJs from 'ethers' // eslint-disable-line
 import multihash from 'multihashes'
 import * as web3Js from 'web3'
 import Web3 from 'web3'
-import swarmgw_fn from 'swarmgw'
 import { waffleChai } from "@ethereum-waffle/chai";
 import * as starknet from 'starknet'
 import * as zokratesJs from 'zokrates-js';
+import * as circomlibjs from 'circomlibjs';
+const snarkjs = require('snarkjs');
+import * as zkkitIncrementalMerkleTree from '@zk-kit/incremental-merkle-tree';
+import * as semaphoreProtocolProof from '@semaphore-protocol/proof'
+// import * as semaphoreProtocolContracts from '@semaphore-protocol/contracts'
+import * as semaphoreProtocolGroup from '@semaphore-protocol/group'
+import * as semaphoreProtocolIdentity from '@semaphore-protocol/identity'
+import * as semaphoreProtocolData from '@semaphore-protocol/data'
+import * as chainlinkFunction from '@chainlink/functions-toolkit'
+import * as spartanECDSA from '@personaelabs/spartan-ecdsa'
+import * as ethereumjsUtil from '@ethereumjs/util'
 import './runWithMocha'
 import * as path from 'path'
 import * as hhEtherMethods from './hardhat-ethers/methods'
+import * as ffjavascript from 'ffjavascript'
+import * as sindri from 'sindri'
+import { isBigInt } from 'web3-validator'
 const chai = require('chai')
 chai.use(waffleChai)
 
-window.swarmgw = swarmgw_fn()
 window.starknet = starknet
 window.chai = chai
 window.ethers = ethersJs
 window.multihashes = multihash
 window['zokrates-js'] = zokratesJs
+window['snarkjs'] = snarkjs
+window['circomlibjs'] = circomlibjs
+window['@zk-kit/incremental-merkle-tree'] = zkkitIncrementalMerkleTree
+
+window['@semaphore-protocol/proof'] = semaphoreProtocolProof
+// window['@semaphore-protocol/contracts'] = semaphoreProtocolContracts
+window['@semaphore-protocol/group'] = semaphoreProtocolGroup
+window['@semaphore-protocol/identity'] = semaphoreProtocolIdentity
+window['@semaphore-protocol/data'] = semaphoreProtocolData
+
+window['@chainlink/functions-toolkit'] = chainlinkFunction
+window['@personaelabs/spartan-ecdsa'] = spartanECDSA
+window['@ethereumjs/util'] = ethereumjsUtil
+
+window["ffjavascript"] = ffjavascript
+
+window["sindri"] = sindri
 
 const scriptReturns = {} // keep track of modules exported values
 const fileContents = {} // keep track of file content
@@ -113,6 +142,8 @@ window.web3Provider = {
       .catch(e => callback(e))
   }
 }
+window.provider = web3Provider
+window.ethereum = web3Provider
 
 window.web3 = new Web3(window.web3Provider)
 
@@ -122,30 +153,35 @@ ethers.provider = new ethers.providers.Web3Provider(window.web3Provider)
 window.hardhat = { ethers }
 for(const method in hhEtherMethods) Object.defineProperty(window.hardhat.ethers, method, { value: hhEtherMethods[method]})
 
+const replacer = (key, value) => {
+  if (isBigInt(value)) value = value.toString()
+  if (typeof value === 'function') value = value.toString()
+  return value
+}
 console.logInternal = console.log
 console.log = function () {
    window.remix.emit('log', {
-     data: Array.from(arguments).map((el) => JSON.parse(JSON.stringify(el)))
+     data: Array.from(arguments).map((el) => JSON.parse(JSON.stringify(el, replacer)))
    })
  }
 
 console.infoInternal = console.info
 console.info = function () {
   window.remix.emit('info', {
-    data: Array.from(arguments).map((el) => JSON.parse(JSON.stringify(el)))
+    data: Array.from(arguments).map((el) => JSON.parse(JSON.stringify(el, replacer)))
   })
 }
 
 console.warnInternal = console.warn
 console.warn = function () {
   window.remix.emit('warn', {
-    data: Array.from(arguments).map((el) => JSON.parse(JSON.stringify(el)))
+    data: Array.from(arguments).map((el) => JSON.parse(JSON.stringify(el, replacer)))
   })
 }
 
 console.errorInternal = console.error
 console.error = function () {
   window.remix.emit('error', {
-    data: Array.from(arguments).map((el) => JSON.parse(JSON.stringify(el)))
+    data: Array.from(arguments).map((el) => JSON.parse(JSON.stringify(el, replacer)))
   })
 }
